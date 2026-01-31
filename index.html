@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MASQIFY</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&family=Rajdhani:wght@300;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        body { 
+            font-family: 'Rajdhani', sans-serif; 
+            /* Updated to Dark Slate Gray / Black theme */
+            background: radial-gradient(circle at 50% 50%, #1E293B 0%, #020617 100%);
+            color: #e2e8f0; 
+            overflow-x: hidden;
+            animation: fadeIn 1.5s ease-in forwards;
+        }
+        .font-phoenix { font-family: 'Orbitron', sans-serif; text-transform: uppercase; letter-spacing: 0.1em; }
+        
+        /* Royal Blue Accents */
+        .text-accent { color: #4169E1; } /* Royal Blue */
+        .bg-accent { background-color: #4169E1; }
+        .border-accent { border-color: #4169E1; }
+
+        .identities-gradient {
+            background: linear-gradient(45deg, #4169E1, #89a5f5, #ffffff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Glow Effects */
+        .glow-blue {
+            box-shadow: 0 0 20px rgba(65, 105, 225, 0.4);
+            border: 1px solid rgba(65, 105, 225, 0.5);
+        }
+
+        /* Flowy Background Accents */
+        .flowy-aura {
+            position: fixed;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(65, 105, 225, 0.07) 0%, transparent 70%);
+            filter: blur(80px);
+            animation: float 15s infinite alternate ease-in-out;
+            z-index: -1;
+        }
+
+        @keyframes float {
+            0% { transform: translate(-20%, -20%) scale(1); }
+            100% { transform: translate(20%, 20%) scale(1.1); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .header-pill {
+            background-color: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 9999px;
+            margin-top: 20px;
+            color: white;
+        }
+
+        .hero-container {
+            position: relative;
+            padding-top: 60px;
+            padding-bottom: 120px;
+        }
+
+        /* 3D Card Styling - Updated for MASQIFY look */
+        .card-container {
+            perspective: 1000px;
+            width: 100%;
+            max-width: 650px;
+            height: 380px;
+            margin: 0 auto;
+        }
+
+        .card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-style: preserve-3d;
+            cursor: pointer;
+        }
+
+        .card-inner.flipped { transform: rotateY(180deg); }
+
+        .card-front, .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 24px;
+            background: linear-gradient(135deg, #0f172a 0%, #020617 100%);
+            color: white;
+            box-shadow: 0 30px 50px -12px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+            border: 1px solid rgba(65, 105, 225, 0.3);
+        }
+
+        .card-back { 
+            transform: rotateY(180deg); 
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            border-color: #4169E1;
+            box-shadow: 0 0 30px rgba(65, 105, 225, 0.2);
+        }
+
+        .chip {
+            width: 45px;
+            height: 35px;
+            background: linear-gradient(135deg, #4169E1 0%, #89a5f5 50%, #4169E1 100%);
+            border-radius: 4px;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.3), 0 0 10px rgba(65, 105, 225, 0.5);
+        }
+
+        .stats-bar {
+            background: 
+                radial-gradient(circle at 20% 20%, rgba(65, 105, 225, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 80% 20%, rgba(138, 165, 245, 0.1) 0%, transparent 40%),
+                radial-gradient(circle at 50% 50%, rgba(30, 41, 59, 0.2) 0%, transparent 50%),
+                radial-gradient(circle at 20% 80%, rgba(100, 116, 139, 0.12) 0%, transparent 40%),
+                radial-gradient(circle at 80% 80%, rgba(65, 105, 225, 0.08) 0%, transparent 40%),
+                rgba(2, 6, 23, 0.9);
+            border-top: 1px solid rgba(65, 105, 225, 0.3);
+            padding: 20px 20px;
+            color: #64748b;
+            width: 100%;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            z-index: 10;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+            letter-spacing: 2px;
+        }
+
+        .sparkle { position: absolute; color: #4169E1; opacity: 0.4; filter: blur(1px); }
+
+        .grid-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            background: 
+                linear-gradient(rgba(65, 105, 225, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(65, 105, 225, 0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+        
+        .copy-icon {
+            cursor: pointer;
+            opacity: 0.5;
+            margin-left: 8px;
+            font-size: 12px;
+            transition: opacity 0.2s;
+        }
+        .copy-icon:hover { opacity: 1; }
+
+        .fab {
+            position: fixed;
+            bottom: 100px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #4169E1, #89a5f5);
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(65, 105, 225, 0.4);
+            z-index: 20;
+            transition: transform 0.2s;
+        }
+        .fab:hover { transform: scale(1.1); }
+
+        .mask-strength {
+            width: 100%;
+            height: 8px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 4px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+        .bar {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.5s, background 0.5s;
+        }
+
+        .why-section {
+            margin-top: 60px;
+            text-align: center;
+            max-width: 800px;
+        }
+        .step-guide {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+        .step {
+            flex: 1;
+            padding: 20px;
+            background: rgba(65, 105, 225, 0.1);
+            border-radius: 12px;
+            border: 1px solid rgba(65, 105, 225, 0.2);
+        }
+        .use-cases {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+        .use-case {
+            text-align: center;
+            padding: 20px;
+            background: rgba(30, 41, 59, 0.5);
+            border-radius: 12px;
+            border: 1px solid rgba(65, 105, 225, 0.2);
+            min-width: 150px;
+        }
+
+        .vault-section {
+            margin-top: 80px;
+            text-align: center;
+            max-width: 1000px;
+        }
+        .vault-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .persona-card {
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(65, 105, 225, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .persona-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(65, 105, 225, 0.2);
+        }
+        .persona-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .persona-details {
+            text-align: left;
+            margin-bottom: 15px;
+        }
+        .burn-btn {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+        .burn-btn:hover {
+            background: linear-gradient(135deg, #dc2626, #b91c1c);
+        }
+        .disintegrate {
+            animation: disintegrate 1s forwards;
+        }
+        @keyframes disintegrate {
+            0% { opacity: 1; transform: scale(1) rotate(0deg); }
+            50% { opacity: 0.5; transform: scale(0.8) rotate(180deg); }
+            100% { opacity: 0; transform: scale(0) rotate(360deg); }
+        }
+
+        .fade-in-element {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+        }
+
+        .fade-in-element.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center">
+    <div class="grid-bg"></div>
+    <div class="flowy-aura" style="top: -10%; left: -10%;"></div>
+    <div class="flowy-aura" style="bottom: -10%; right: -10%; animation-delay: -5s;"></div>
+
+    <nav class="header-pill px-10 py-3 flex items-center justify-between w-[90%] max-w-5xl z-50">
+        <div class="flex gap-8 text-[10px] font-bold uppercase tracking-widest">
+            <a href="about.html" class="hover:text-accent transition">About Us</a>
+        </div>
+        <div class="flex items-center gap-2">
+            <div class="w-2 h-2 bg-accent rounded-full animate-ping"></div>
+            <h1 class="font-phoenix text-xl font-black tracking-tighter">MASQ<span class="text-accent">IFY</span></h1>
+        </div>
+        <div class="flex gap-8 text-[10px] font-bold uppercase tracking-widest">
+            <a href="#" onclick="alert('Contact section coming soon')" class="hover:text-accent transition">Contact</a>
+        </div>
+    </nav>
+
+    <main class="hero-container flex flex-col items-center text-center w-full max-w-6xl px-4">
+        
+        <span class="sparkle top-20 left-10 text-5xl">✦</span>
+        <span class="sparkle top-40 right-10 text-3xl">✦</span>
+
+        <h2 class="text-5xl md:text-7xl font-bold mb-6 tracking-tight max-w-4xl text-white fade-in-element">
+            Empowering <span class="identities-gradient italic">Identities</span> Through Digital Shields
+        </h2>
+        
+        <p class="text-gray-400 max-w-md mb-10 text-sm leading-relaxed mono fade-in-element">
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum volutpat, lorem eu porttitor vehicula, neque nibh cursus nisi, eu consectetur mi odio sit amet risus.
+        </p>
+
+        <div class="card-container mb-12 fade-in-element" onclick="this.querySelector('.card-inner').classList.toggle('flipped')">
+            <div class="card-inner">
+                <div class="card-front p-8 flex flex-col justify-between text-left">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-[9px] tracking-[0.4em] text-accent uppercase font-bold mono">Identification_Mask</p>
+                            <h3 class="font-phoenix text-4xl font-black text-white">MASQIFY</h3>
+                        </div>
+                        <div class="chip"></div>
+                    </div>
+
+                    <div class="flex gap-6 items-center">
+                        <img id="avatar" src="" alt="Avatar" class="w-32 h-32 rounded-2xl border border-blue-500/30 bg-blue-900/20 backdrop-blur-sm">
+                        <div class="flex-1 space-y-2">
+                            <div>
+                                <label class="block text-[10px] font-bold text-blue-400 opacity-60 mono uppercase">DECOY NAME</label>
+                                <p id="full-name" class="text-xl font-bold uppercase truncate text-white tracking-tight"></p>
+                            </div>
+                            <div class="grid grid-cols-2 gap-2">
+                                <div>
+                                    <label class="block text-[10px] font-bold text-blue-400 opacity-60 mono uppercase">ALIAS</label>
+                                    <p id="alias" class="text-sm font-mono text-accent font-bold"></p>
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] font-bold text-blue-400 opacity-60 mono uppercase">SECURE LINE</label>
+                                    <p id="phone" class="text-sm font-mono text-white"></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-between items-end border-t border-blue-500/20 pt-4">
+                        <div>
+                            <label class="block text-[10px] font-bold text-blue-400 opacity-60 mono uppercase">VIRTUAL SECTOR</label>
+                            <p id="job" class="text-xs italic text-gray-300"></p>
+                        </div>
+                        <div class="flex flex-col items-end gap-2">
+                            <p class="text-[9px] opacity-30 mono">MASK_ID // 2026_GEN</p>
+                            <button onclick="saveToVault()" class="text-[10px] bg-accent/20 hover:bg-accent/40 text-accent px-3 py-2 rounded border border-accent/30 transition">SAVE TO VAULT</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-back">
+                    <div class="text-center">
+                        <h2 class="font-phoenix text-8xl font-black opacity-10 select-none text-blue-500">M</h2>
+                        <p class="mt-4 text-[10px] tracking-[0.5em] text-accent font-bold font-mono">HARD TO GIT</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mask-strength fade-in-element">
+            <div class="bar" id="strength-bar"></div>
+        </div>
+
+        <div class="flex gap-4 mb-20 mt-6">
+            <button onclick="generatePersona()" class="bg-accent text-white px-12 py-5 rounded-full font-bold text-base btn-glow transition transform active:scale-95 fade-in-element">
+                GENERATE
+            </button>
+        </div>
+        <section class="why-section fade-in-element">
+            <h3 class="text-5xl font-bold mb-8 text-white">How Masqify Works</h3>
+            <div class="step-guide">
+                <div class="step">
+                    <h4 class="text-lg font-bold text-accent mb-2">1. Generate</h4>
+                    <p class="text-sm text-gray-400">Create your digital mask with one click</p>
+                </div>
+                <div class="step">
+                    <h4 class="text-lg font-bold text-accent mb-2">2. Use</h4>
+                    <p class="text-sm text-gray-400">Deploy your identity for secure interactions</p>
+                </div>
+                <div class="step">
+                    <h4 class="text-lg font-bold text-accent mb-2">3. Burn</h4>
+                    <p class="text-sm text-gray-400">Discard when done, leaving no trace</p>
+                </div>
+            </div>
+            <h4 class="text-xl font-bold mb-6 text-white">Perfect For</h4>
+            <div class="use-cases">
+                <div class="use-case">
+                    <div class="text-4xl mb-2">📰</div>
+                    <p class="text-sm font-bold">Newsletters</p>
+                </div>
+                <div class="use-case">
+                    <div class="text-4xl mb-2">⬇️</div>
+                    <p class="text-sm font-bold">Sketchy Downloads</p>
+                </div>
+                <div class="use-case">
+                    <div class="text-4xl mb-2">🎟️</div>
+                    <p class="text-sm font-bold">Free Trials</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="vault-section fade-in-element">
+            <h3 class="text-5xl font-bold mb-8 text-white">The Vault</h3>
+            <p class="text-gray-400 mb-6">Your saved digital identities. Login to access your personal vault.</p>
+            <div class="vault-grid">
+                <div class="persona-card" data-expiry="2026-02-01T12:00:00">
+                    <div class="persona-header">
+                        <h4 class="text-lg font-bold text-white">Alex Johnson</h4>
+                        <span class="expiry-timer text-red-400 text-sm"></span>
+                    </div>
+                    <div class="persona-details">
+                        <p class="text-sm text-gray-400">@CyberNinja</p>
+                        <p class="text-sm text-gray-400">555-123-4567</p>
+                        <p class="text-sm text-gray-400">Systems Analyst // TechCorp</p>
+                    </div>
+                    <button onclick="burnIdentity(this.parentElement)" class="burn-btn">🔥 BURN IDENTITY</button>
+                </div>
+                <div class="persona-card" data-expiry="2026-02-02T14:30:00">
+                    <div class="persona-header">
+                        <h4 class="text-lg font-bold text-white">Jordan Smith</h4>
+                        <span class="expiry-timer text-yellow-400 text-sm"></span>
+                    </div>
+                    <div class="persona-details">
+                        <p class="text-sm text-gray-400">@TechPhantom</p>
+                        <p class="text-sm text-gray-400">555-987-6543</p>
+                        <p class="text-sm text-gray-400">Data Scientist // InnovateLabs</p>
+                    </div>
+                    <button onclick="burnIdentity(this.parentElement)" class="burn-btn">🔥 BURN IDENTITY</button>
+                </div>
+                <div class="persona-card" data-expiry="2026-02-03T09:15:00">
+                    <div class="persona-header">
+                        <h4 class="text-lg font-bold text-white">Taylor Martinez</h4>
+                        <span class="expiry-timer text-green-400 text-sm"></span>
+                    </div>
+                    <div class="persona-details">
+                        <p class="text-sm text-gray-400">@DataGhost</p>
+                        <p class="text-sm text-gray-400">555-456-7890</p>
+                        <p class="text-sm text-gray-400">Cyber Specialist // CyberSec</p>
+                    </div>
+                    <button onclick="burnIdentity(this.parentElement)" class="burn-btn">🔥 BURN IDENTITY</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <button onclick="generatePersona()" class="fab" title="Reroll Mask">🔄</button>
+
+    <footer class="stats-bar">
+        <p class="text-center">© 2026 MASQIFY // HARD TO GIT</p>
+    </footer>
+
+    <script>
+        const firstNames = ['Alex', 'Jordan', 'Taylor', 'Morgan', 'Casey', 'Riley', 'Avery', 'Blake', 'Cameron', 'Dakota'];
+        const lastNames = ['Smith', 'Johnson', 'Williams', 'Brown', 'Jones', 'Garcia', 'Miller', 'Davis', 'Rodriguez', 'Martinez'];
+        const aliases = ['CyberNinja', 'TechPhantom', 'DataGhost', 'CodeWarrior', 'NetRunner', 'PixelPunk', 'ByteBender', 'QuantumQuake', 'ShadowCoder', 'FluxFighter'];
+        const jobTitles = ['Systems Analyst', 'Software Engineer', 'Data Scientist', 'Cyber Specialist', 'Network Admin', 'DevOps Eng', 'AI Researcher', 'Blockchain Dev'];
+        const companies = ['TechCorp', 'InnovateLabs', 'CyberSec', 'DataFlow', 'Quantum', 'ByteWorks'];
+
+        function copyToClipboard(id) {
+            const text = document.getElementById(id).textContent;
+            navigator.clipboard.writeText(text).then(() => {
+                alert('Copied to clipboard!');
+            });
+        }
+
+        function saveToVault() {
+            alert('Please login or sign up to save identities to your vault!');
+        }
+
+        function burnIdentity(card) {
+            card.classList.add('disintegrate');
+            setTimeout(() => {
+                card.style.display = 'none';
+                alert('Identity burned successfully!');
+            }, 1000);
+        }
+
+        function updateExpiryTimers() {
+            const cards = document.querySelectorAll('.persona-card');
+            cards.forEach(card => {
+                const expiryStr = card.dataset.expiry;
+                const expiry = new Date(expiryStr);
+                const now = new Date();
+                const diff = expiry - now;
+
+                if (diff > 0) {
+                    const hours = Math.floor(diff / (1000 * 60 * 60));
+                    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                    card.querySelector('.expiry-timer').textContent = `Expires in ${hours}h ${minutes}m`;
+                } else {
+                    card.querySelector('.expiry-timer').textContent = 'Expired';
+                    card.querySelector('.expiry-timer').classList.remove('text-yellow-400', 'text-green-400');
+                    card.querySelector('.expiry-timer').classList.add('text-red-400');
+                }
+            });
+        }
+
+        function generatePersona() {
+            const seed = Math.random().toString(36).substring(2, 15);
+            document.getElementById('avatar').src = `https://api.dicebear.com/7.x/bottts/svg?seed=${seed}`;
+
+            const firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
+            const lastName = lastNames[Math.floor(Math.random() * lastNames.length)];
+            document.getElementById('full-name').textContent = `${firstName} ${lastName}`;
+
+            const alias = aliases[Math.floor(Math.random() * aliases.length)];
+            document.getElementById('alias').textContent = `@${alias.toLowerCase()}`;
+
+            const areaCode = Math.floor(Math.random() * 900) + 100;
+            const exchange = Math.floor(Math.random() * 900) + 100;
+            const number = Math.floor(Math.random() * 9000) + 1000;
+            document.getElementById('phone').textContent = `${areaCode}-${exchange}-${number}`;
+
+            const jobTitle = jobTitles[Math.floor(Math.random() * jobTitles.length)];
+            const company = companies[Math.floor(Math.random() * companies.length)];
+            document.getElementById('job').textContent = `${jobTitle} // ${company}`;
+
+            // Update mask strength meter
+            const strength = Math.random();
+            const bar = document.getElementById('strength-bar');
+            if (strength > 0.7) {
+                bar.style.width = '100%';
+                bar.style.background = '#10b981'; // green
+            } else if (strength > 0.4) {
+                bar.style.width = '70%';
+                bar.style.background = '#f59e0b'; // yellow
+            } else {
+                bar.style.width = '40%';
+                bar.style.background = '#ef4444'; // red
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            generatePersona();
+            updateExpiryTimers();
+            setInterval(updateExpiryTimers, 60000); // Update every minute
+
+            // Scroll fade-in animation
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            document.querySelectorAll('.fade-in-element').forEach(el => observer.observe(el));
+        });
+    </script>
+</body>
+</html>

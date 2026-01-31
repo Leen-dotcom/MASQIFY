@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MASQIFY | THE ARCHITECTS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&family=Rajdhani:wght@300;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        body { 
+            font-family: 'Rajdhani', sans-serif; 
+            background: radial-gradient(circle at 50% 50%, #1E293B 0%, #020617 100%);
+            color: #e2e8f0; 
+            overflow-x: hidden;
+        }
+        .font-phoenix { font-family: 'Orbitron', sans-serif; text-transform: uppercase; letter-spacing: 0.1em; }
+        
+        .text-accent { color: #4169E1; } 
+        .bg-accent { background-color: #4169E1; }
+        .border-accent { border-color: #4169E1; }
+
+        .header-pill {
+            background-color: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 9999px;
+            margin-top: 20px;
+        }
+
+        /* Flowy Background Accents */
+        .flowy-aura {
+            position: fixed;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(65, 105, 225, 0.07) 0%, transparent 70%);
+            filter: blur(80px);
+            animation: float 15s infinite alternate ease-in-out;
+            z-index: -1;
+        }
+
+        @keyframes float {
+            0% { transform: translate(-20%, -20%) scale(1); }
+            100% { transform: translate(20%, 20%) scale(1.1); }
+        }
+
+        @keyframes fadeIn {
+            0% { opacity: 0; transform: translateY(20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 1.2s ease-out forwards;
+            opacity: 0;
+        }
+
+        /* Team Card Styling */
+        .team-card {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(65, 105, 225, 0.2);
+            border-radius: 20px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            height: 100%;
+            display: grid;
+            place-items: center;
+            padding: 2rem;
+        }
+
+        .team-card:hover {
+            transform: translateY(-10px);
+            border-color: #4169E1;
+            box-shadow: 0 0 30px rgba(65, 105, 225, 0.2);
+        }
+
+        .team-card::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 2px;
+            background: linear-gradient(90deg, transparent, #4169E1, transparent);
+            transform: translateX(-100%);
+            transition: 0.5s;
+        }
+
+        .team-card:hover::before { transform: translateX(100%); }
+
+        .team-card.expanded {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1000;
+            width: 90vw;
+            max-width: 900px;
+            height: auto;
+            max-height: 80vh;
+            box-shadow: 0 0 100px rgba(65, 105, 225, 0.8);
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(20px);
+            border: 2px solid rgba(65, 105, 225, 0.4);
+            display: block !important;
+            padding: 0 !important;
+        }
+
+        .team-card.expanded .card-content {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 40px;
+            width: 100%;
+            padding: 40px;
+        }
+
+        .team-card.expanded .card-info {
+            text-align: left;
+            flex: 1;
+        }
+
+        .team-card.expanded .member-avatar {
+            width: 180px;
+            height: 180px;
+            border-width: 4px;
+            flex-shrink: 0;
+            margin-bottom: 0;
+        }
+
+        .team-card.expanded .member-details {
+            opacity: 1;
+            max-height: 400px;
+            margin-top: 20px;
+        }
+
+        .member-details {
+            opacity: 0;
+            max-height: 0;
+            overflow: hidden;
+            transition: all 0.4s ease;
+        }
+
+        /* Grid container behavior when a card is expanded */
+        .team-grid.has-expanded {
+            position: relative;
+        }
+
+        .team-grid.has-expanded::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            z-index: 999;
+            pointer-events: none;
+        }
+
+        .team-grid.has-expanded .team-card:not(.expanded) {
+            opacity: 0.2;
+            transform: scale(0.9);
+            filter: blur(2px);
+            pointer-events: none;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Prevent body scroll when modal is open */
+        body.modal-open {
+            overflow: hidden;
+        }
+
+        /* Ensure smooth scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .team-card.expanded {
+                width: 95vw;
+                max-width: none;
+            }
+
+            .team-card.expanded .card-content {
+                padding: 20px;
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .team-card.expanded .member-avatar {
+                width: 120px;
+                height: 120px;
+            }
+        }
+
+        .member-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: 2px solid rgba(65, 105, 225, 0.3);
+            padding: 5px;
+            background: #020617;
+            transition: all 0.4s ease;
+        }
+
+        .grid-bg {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            z-index: -1;
+            background: 
+                linear-gradient(rgba(65, 105, 225, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(65, 105, 225, 0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+
+        .stats-bar {
+            background: 
+                radial-gradient(circle at 20% 20%, rgba(65, 105, 225, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 80% 20%, rgba(138, 165, 245, 0.1) 0%, transparent 40%),
+                radial-gradient(circle at 50% 50%, rgba(30, 41, 59, 0.2) 0%, transparent 50%),
+                radial-gradient(circle at 20% 80%, rgba(100, 116, 139, 0.12) 0%, transparent 40%),
+                radial-gradient(circle at 80% 80%, rgba(65, 105, 225, 0.08) 0%, transparent 40%),
+                rgba(2, 6, 23, 0.9);
+            border-top: 1px solid rgba(65, 105, 225, 0.3);
+            padding: 20px 20px;
+            color: #64748b;
+            width: 100%;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            z-index: 10;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+            letter-spacing: 2px;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center pb-24">
+    <div class="grid-bg"></div>
+    <div class="flowy-aura" style="top: -10%; left: -10%;"></div>
+    <div class="flowy-aura" style="bottom: -10%; right: -10%; animation-delay: -5s;"></div>
+
+    <nav class="header-pill px-10 py-3 flex items-center justify-between w-[90%] max-w-5xl z-50">
+        <div class="flex gap-8 text-[10px] font-bold uppercase tracking-widest">
+            <a href="index.html" class="hover:text-accent transition">Home</a>
+        </div>
+        <div class="flex items-center gap-2">
+            <div class="w-2 h-2 bg-accent rounded-full animate-ping"></div>
+            <h1 class="font-phoenix text-xl font-black tracking-tighter">MASQ<span class="text-accent">IFY</span></h1>
+        </div>
+        <div class="flex gap-8 text-[10px] font-bold uppercase tracking-widest">
+            <a href="#" class="text-accent transition">The Team</a>
+        </div>
+    </nav>
+
+    <main class="mt-20 flex flex-col items-center w-full max-w-6xl px-6 fade-in">
+        <div class="text-center mb-16">
+            <p class="text-accent font-mono tracking-[0.5em] text-xs mb-2 uppercase">Hard to Git</p>
+            <h2 class="text-5xl md:text-6xl font-bold text-white font-phoenix">MEET THE TEAM</h2>
+            <div class="h-1 w-24 bg-accent mx-auto mt-4 rounded-full"></div>
+        </div>
+
+        <div class="team-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 w-full min-h-[400px]">
+            
+            <div class="team-card">
+                <div class="card-content text-center">
+                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" alt="Lead" class="member-avatar mb-4 mx-auto">
+                    <div class="card-info">
+                        <h4 class="text-xl font-bold text-white uppercase">Lead Dev</h4>
+                        <p class="text-accent font-mono text-xs mb-4">CHUA</p>
+                        <p class="text-gray-400 text-sm leading-relaxed">Specializing in secure data encryption and identity masking protocols.</p>
+                        <div class="member-details">
+                            <div class="border-t border-gray-600 pt-4 mt-4">
+                                <p class="text-xs text-gray-500 mb-2">EXPERTISE</p>
+                                <div class="flex flex-wrap gap-2 justify-center">
+                                    <span class="px-2 py-1 bg-accent/20 text-accent text-xs rounded">Cryptography</span>
+                                    <span class="px-2 py-1 bg-accent/20 text-accent text-xs rounded">Zero-Knowledge Proofs</span>
+                                    <span class="px-2 py-1 bg-accent/20 text-accent text-xs rounded">Blockchain</span>
+                                </div>
+                                <p class="text-xs text-gray-500 mt-4 mb-2">YEARS OF SERVICE</p>
+                                <p class="text-accent font-mono">8+ Years</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="team-card">
+                <div class="card-content text-center">
+                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah" alt="UI" class="member-avatar mb-4 mx-auto">
+                    <div class="card-info">
+                        <h4 class="text-xl font-bold text-white uppercase">UI Designer</h4>
+                        <p class="text-accent font-mono text-xs mb-4">VILLACORZA</p>
+                        <p class="text-gray-400 text-sm leading-relaxed">Crafting the futuristic interface and seamless user experience for the vault.</p>
+                        <div class="member-details">
+                            <div class="border-t border-gray-600 pt-4 mt-4">
+                                <p class="text-xs text-gray-500 mb-2">EXPERTISE</p>
+                                <div class="flex flex-wrap gap-2 justify-center">
+                                    <span class="px-2 py-1 bg-accent/20 text-accent text-xs rounded">UX Design</span>
+                                    <span class="px-2 py-1 bg-accent/20 text-accent text-xs rounded">Cyberpunk Aesthetics</span>
+                                    <span class="px-2 py-1 bg-accent/20 text-accent text-xs rounded">Motion Design</span>
+                                </div>
+                                <p class="text-xs text-gray-500 mt-4 mb-2">YEARS OF SERVICE</p>
+                                <p class="text-accent font-mono">6+ Years</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="team-card">
+                <div class="card-content text-center">
+                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Kevin" alt="Backend" class="member-avatar mb-4 mx-auto">
+                    <div class="card-info">
+                        <h4 class="text-xl font-bold text-white uppercase">Systems Eng</h4>
+                        <p class="text-accent font-mono text-xs mb-4">CASIANO</p>
+                        <p class="text-gray-400 text-sm leading-relaxed">Managing server-side logic and the high-speed persona generation engine.</p>
+                        <div class="member-details">
+                            <div class="border-t border-gray-600 pt-4 mt-4">
+                                <p class="text-xs text-gray-500 mb-2">EXPERTISE</p>
+                                <div class="flex flex-wrap gap-2 justify-center">
+                                    <span class="px-2 py-1 bg-accent/20 text-accent text-xs rounded">Distributed Systems</span>
+                                    <span class="px-2 py-1 bg-accent/20 text-accent text-xs rounded">High-Performance Computing</span>
+                                    <span class="px-2 py-1 bg-accent/20 text-accent text-xs rounded">API Architecture</span>
+                                </div>
+                                <p class="text-xs text-gray-500 mt-4 mb-2">YEARS OF SERVICE</p>
+                                <p class="text-accent font-mono">7+ Years</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="team-card">
+                <div class="card-content text-center">
+                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Luna" alt="Security" class="member-avatar mb-4 mx-auto">
+                    <div class="card-info">
+                        <h4 class="text-xl font-bold text-white uppercase">Cyber Sec</h4>
+                        <p class="text-accent font-mono text-xs mb-4">BUENAOBRA</p>
+                        <p class="text-gray-400 text-sm leading-relaxed">Ensuring that every digital identity remains untraceable and burned on command.</p>
+                        <div class="member-details">
+                            <div class="border-t border-gray-600 pt-4 mt-4">
+                                <p class="text-xs text-gray-500 mb-2">EXPERTISE</p>
+                                <div class="flex flex-wrap gap-2 justify-center">
+                                    <span class="px-2 py-1 bg-accent/20 text-accent text-xs rounded">Penetration Testing</span>
+                                    <span class="px-2 py-1 bg-accent/20 text-accent text-xs rounded">Forensic Analysis</span>
+                                    <span class="px-2 py-1 bg-accent/20 text-accent text-xs rounded">Zero-Trust Security</span>
+                                </div>
+                                <p class="text-xs text-gray-500 mt-4 mb-2">YEARS OF SERVICE</p>
+                                <p class="text-accent font-mono">9+ Years</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        
+        </div>
+
+        <div class="mt-24 p-10 bg-blue-900/10 border border-blue-500/20 rounded-3xl max-w-4xl text-center">
+            <h3 class="font-phoenix text-2xl mb-4 text-white">Our Mission</h3>
+            <p class="text-gray-400 font-mono text-sm leading-7">
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum volutpat, lorem eu porttitor vehicula, neque nibh cursus nisi, eu consectetur mi odio sit amet risus.
+            </p>
+        </div>
+    </main>
+
+     <footer class="stats-bar">
+        <p class="text-center">© 2026 MASQIFY // HARD TO GIT</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const teamCards = document.querySelectorAll('.team-card');
+            const teamGrid = document.querySelector('.team-grid');
+            let expandedCard = null;
+            let isAnimating = false;
+
+            function expandCard(card) {
+                if (isAnimating) return;
+                isAnimating = true;
+
+                // Collapse any currently expanded card
+                if (expandedCard) {
+                    expandedCard.classList.remove('expanded');
+                    teamGrid.classList.remove('has-expanded');
+                    document.body.classList.remove('modal-open');
+                }
+
+                // Expand the clicked card
+                card.classList.add('expanded');
+                teamGrid.classList.add('has-expanded');
+                document.body.classList.add('modal-open');
+                expandedCard = card;
+
+                // Reset animation flag after transition
+                setTimeout(() => {
+                    isAnimating = false;
+                }, 400);
+            }
+
+            function collapseCard() {
+                if (isAnimating || !expandedCard) return;
+                isAnimating = true;
+
+                expandedCard.classList.remove('expanded');
+                teamGrid.classList.remove('has-expanded');
+                document.body.classList.remove('modal-open');
+                expandedCard = null;
+
+                // Reset animation flag after transition
+                setTimeout(() => {
+                    isAnimating = false;
+                }, 400);
+            }
+
+            teamCards.forEach(card => {
+                card.addEventListener('click', function(e) {
+                    e.stopPropagation();
+
+                    // If clicking the same card that's already expanded, collapse it
+                    if (this === expandedCard) {
+                        collapseCard();
+                        return;
+                    }
+
+                    // Expand the clicked card
+                    expandCard(this);
+                });
+            });
+
+            // Close expanded card when clicking outside or on backdrop
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('.team-card') && expandedCard) {
+                    collapseCard();
+                }
+            });
+
+            // Close on Escape key
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && expandedCard) {
+                    collapseCard();
+                }
+            });
+        });
+    </script>
+
+</body>
+</html>
